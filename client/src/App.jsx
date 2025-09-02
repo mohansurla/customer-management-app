@@ -1,32 +1,29 @@
-import { Routes, Route, Link } from "react-router-dom"
-import HomePage from "./pages/HomePage"
-import CustomersPage from "./pages/CustomersPage"
-import CustomerDetailsPage from "./pages/CustomerDetailsPage"
-import AddCustomerPage from "./pages/AddCustomerPage"
-import AddAddressPage from "./pages/AddAddressPage";
-import EditCustomerPage from "./pages/EditCustomerPage";
-import EditAddressPage from "./pages/EditAddressPage";
+import { Toaster } from "./components/ui/toaster";
+import { Toaster as Sonner } from "./components/ui/sonner";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Routes, Route } from "react-router-dom";
+import CustomerList from "./pages/CustomerList";
+import CustomerDetail from "./pages/CustomerDetail";
+import NotFound from "./pages/NotFound";
 
-export default function App() {
-  return (
-    <div className="p-6">
-      <nav className="flex gap-4 mb-6">
-          <Link to="/" className="text-blue-500">Home</Link>
-          <Link to="/customers" className="text-blue-500">Customers</Link>
-          <Link to="/customers/add" className="text-blue-500">Add Customer</Link>
-      </nav>
+import "./App.css"
 
-      <div className="max-w-5xl mx-auto p-6">
-          <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/customers" element={<CustomersPage />} />
-              <Route path="/customers/add" element={<AddCustomerPage />} />
-              <Route path="/customers/:id" element={<CustomerDetailsPage />} />
-              <Route path="/customers/:id/add-address" element={<AddAddressPage />} />
-              <Route path="/customers/:id/edit" element={<EditCustomerPage />} />
-              <Route path="/addresses/:id/edit" element={<EditAddressPage />} />
-          </Routes>
-      </div>
-    </div>
-  )
-}
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <Routes>
+        <Route path="/" element={<CustomerList />} />
+        <Route path="/customers/:id" element={<CustomerDetail />} />
+        {/* Catch-all route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;

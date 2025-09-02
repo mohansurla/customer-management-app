@@ -61,10 +61,10 @@ db.serialize(() => {
   console.log('✅ Tables ready.');
 
   // Seed one row (idempotent)
-  db.run(`
-    INSERT OR IGNORE INTO customers (id, first_name, last_name, phone_number)
-    VALUES (1, 'John', 'Doe', '1234567890')
-  `);
+  // db.run(`
+  //   INSERT OR IGNORE INTO customers (id, first_name, last_name, phone_number)
+  //   VALUES (1, 'John', 'Doe', '1234567890')
+  // `);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
