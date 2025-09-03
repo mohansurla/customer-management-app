@@ -9,6 +9,8 @@ import { Badge } from "../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { ArrowLeft, Plus, Phone, Calendar, Edit, Trash2, User, MapPin } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
+import { toApiCustomer, fromApiCustomer, toApiAddress, fromApiAddress } from "../utils/transform";
+
 
 export default function CustomerDetail() {
   const { id } = useParams();
@@ -26,9 +28,9 @@ export default function CustomerDetail() {
     const fetchData = async () => {
       try {
         const res = await api.get(`/customers/${id}`);
-        setCustomer(res.data.data);
+        setCustomer(fromApiCustomer(res.data.data));
         const addrRes = await api.get(`/customers/${id}/addresses`);
-        setAddresses(addrRes.data.data);
+        setAddresses(addrRes.data.data.map(fromApiAddress));
       } catch (err) {
         console.error("❌ Error loading customer", err);
       }
@@ -47,8 +49,8 @@ export default function CustomerDetail() {
   // ✅ Update customer
   const handleUpdateCustomer = async (customerData) => {
     try {
-      const res = await api.put(`/customers/${id}`, customerData);
-      setCustomer(res.data.data);
+      const res = await api.put(`/customers/${id}`, toApiCustomer(customerData));
+      setCustomer(fromApiCustomer(res.data.data));
       toast({ title: "Customer Updated ✅" });
       setShowCustomerForm(false);
     } catch (err) {
@@ -72,14 +74,14 @@ export default function CustomerDetail() {
   const handleSaveAddress = async (addressData) => {
     try {
       if (editingAddress) {
-        const res = await api.put(`/addresses/${editingAddress.id}`, addressData);
+        const res = await api.put(`/addresses/${editingAddress.id}`, toApiAddress(addressData));
         setAddresses((prev) =>
-          prev.map((a) => (a.id === editingAddress.id ? res.data.data : a))
+          prev.map((a) => (a.id === editingAddress.id ? fromApiAddress(res.data.data) : a))
         );
         toast({ title: "Address Updated ✅" });
       } else {
-        const res = await api.post(`/customers/${id}/addresses`, addressData);
-        setAddresses((prev) => [...prev, res.data.data]);
+        const res = await api.post(`/customers/${id}/addresses`, toApiAddress(addressData));
+        setAddresses((prev) => [...prev, fromApiAddress(res.data.data)]);
         toast({ title: "Address Added ✅" });
       }
       setShowAddressForm(false);

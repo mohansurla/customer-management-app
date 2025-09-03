@@ -6,6 +6,8 @@ import { SearchAndFilter } from "../components/SearchAndFilter";
 import { Button } from "../components/ui/button";
 import { Users, MapPin, Plus } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
+import { toApiCustomer, fromApiCustomer } from "../utils/transform";
+
 
 export default function CustomerList() {
   const [customers, setCustomers] = useState([]);
@@ -25,7 +27,7 @@ export default function CustomerList() {
     const fetchData = async () => {
       try {
         const res = await api.get("/customers?limit=100");
-        setCustomers(res.data.data);
+        setCustomers(res.data.data.map(fromApiCustomer));
 
         // fetch all addresses
         const allAddresses = [];
@@ -86,14 +88,14 @@ export default function CustomerList() {
   const handleSaveCustomer = async (customerData) => {
     try {
       if (editingCustomer) {
-        const res = await api.put(`/customers/${editingCustomer.id}`, customerData);
+        const res = await api.put(`/customers/${editingCustomer.id}`, toApiCustomer(customerData));
         setCustomers((prev) =>
-          prev.map((c) => (c.id === editingCustomer.id ? res.data.data : c))
+          prev.map((c) => (c.id === editingCustomer.id ? fromApiCustomer(res.data.data) : c))
         );
         toast({ title: "Customer Updated ✅" });
       } else {
-        const res = await api.post("/customers", customerData);
-        setCustomers((prev) => [res.data.data, ...prev]);
+        const res = await api.post("/customers", toApiCustomer(customerData));
+        setCustomers((prev) => [fromApiCustomer(res.data.data), ...prev]);
         toast({ title: "Customer Created ✅" });
       }
       setShowCustomerForm(false);
@@ -137,7 +139,7 @@ export default function CustomerList() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
-          <div>
+          <div className="space-y-2">
             <h1 className="text-4xl font-bold bg-gradient-hero bg-clip-text text-transparent">
               Customer Management
             </h1>
